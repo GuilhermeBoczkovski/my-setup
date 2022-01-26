@@ -1,0 +1,51 @@
+---
+##################
+### KUBECONFIG ###
+##################
+
+- name: Create .kube directory if it does not exist
+  ansible.builtin.file:
+    path: /home/{{ username }}/.kube
+    state: directory
+    mode: '0665'
+  when: my_k8s_server is defined
+
+- name: Configure kubeconfig
+  ansible.builtin.copy:
+    src: ../files/kubeconfig
+    dest: /home/{{ username }}/.kube/config
+    owner: '{{ username }}'
+    group: '{{ username }}'
+    mode: '0664'
+    remote_src: no
+  when: my_k8s_server is defined
+
+#####################
+### BASHRC CONFIG ###
+#####################
+
+- name: Edit user .bashrc
+  become: true
+  blockinfile:
+    dest: "/home/{{ username }}/.bashrc"
+    block: |
+      alias k='kubectl'
+      alias kctx='kubectl ctx'
+      alias kns='kubectl ns'
+      alias py="python3"
+      export PATH="${PATH}:${HOME}/.krew/bin"
+    create: yes
+
+- name: Edit root .bashrc
+  become: true
+  blockinfile:
+    dest: "/root/.bashrc"
+    block: |
+      alias k='kubectl'
+      alias kctx='kubectl ctx'
+      alias kns='kubectl ns'
+      alias py="python3"
+      export PATH="${PATH}:${HOME}/.krew/bin"
+    create: yes
+
+# TODO: awscli config

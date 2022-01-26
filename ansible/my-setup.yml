@@ -1,0 +1,13 @@
+---
+- name: Set my look
+  hosts: localhost
+  connection: local
+  become: yes
+  become_method: sudo
+  roles:
+    - role: my-look
+      when: my_look == 'enabled'
+    - role: my-conf
+      when: my_conf == 'enabled'
+    - role: my-tools
+      when: my_tools == 'enabled'

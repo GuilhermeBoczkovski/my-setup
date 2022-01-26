@@ -1,0 +1,14 @@
+---
+##############
+### VISUAL ###
+##############
+    
+- name: Configure Tweaks
+  become: false
+  shell:
+    cmd: |
+      gsettings set org.gnome.desktop.interface cursor-theme 'DMZ-Black' \
+      && gsettings set org.gnome.desktop.interface gtk-theme 'Flat-Remix-GTK-Blue-Darkest-NoBorder' \
+      && gsettings set org.gnome.desktop.interface icon-theme 'Flat-Remix-Blue-Dark' \
+      && gsettings set org.gnome.shell enabled-extensions '@as []' \
+      && gsettings set org.gnome.desktop.interface document-font-name 'Hack 11'

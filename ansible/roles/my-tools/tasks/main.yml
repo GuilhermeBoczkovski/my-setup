@@ -1,0 +1,142 @@
+---
+################
+### APT APPS ###
+################
+- name: Install apt apps latest
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: latest
+    install_recommends: yes
+  loop: '{{ apt_apps }}'
+
+######################
+### HASHICORP APPS ###
+######################
+
+- name: Install Vagrant {{ vagrant_version }}
+  become: true
+  unarchive:
+    src: 'https://releases.hashicorp.com/vagrant/{{ vagrant_version }}/vagrant_{{ vagrant_version }}_linux_amd64.zip'
+    dest: /usr/local/bin
+    remote_src: yes
+
+- name: Install Vault {{ vault_version }}
+  become: true
+  unarchive:
+    src: 'https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip'
+    dest: /usr/local/bin
+    remote_src: yes
+    
+- name: Install Terraform {{ terraform_version }}
+  become: true
+  unarchive:
+    src: 'https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip'
+    dest: /usr/local/bin
+    remote_src: yes
+
+##################
+### KUBERNETES ###
+##################
+
+- name: Add Apt signing key
+  become: true
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add kubectl repository
+  become: true
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes
+
+- name: Install kubectl package
+  apt: 
+    name: kubectl
+
+# KREW
+
+- name: Download Krew {{ krew_version }}
+  become: true
+  unarchive:
+    src: 'https://github.com/kubernetes-sigs/krew/releases/download/v{{ krew_version }}/krew-linux_amd64.tar.gz'
+    dest: /tmp
+    remote_src: yes
+
+- name: Copy krew to bin
+  copy: 
+    src: /tmp/krew-linux_amd64
+    dest: /usr/local/bin/krew
+    mode: 0755
+    remote_src: yes 
+
+# KREW PLUGINS
+
+- name: Run Krew Update
+  shell: krew update
+  args:
+    creates: /root/.krew/index/plugins/krew_plugins.yaml
+
+- name: Install Krew plugins
+  shell: "krew install {{ item }}"
+  loop: "{{ krew_plugins }}"
+
+##############
+### VSCODE ###
+##############
+
+- block:
+  - name: Add Microsoft Key
+    become: true
+    apt_key:
+      url: https://packages.microsoft.com/keys/microsoft.asc
+      state: present
+  - name: Add VSCode Repository
+    become: true
+    apt_repository:
+      repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+      state: present
+      filename: vscode
+  - name: Install VSCode
+    become: true
+    apt:
+      name: code
+  - name: Install VSCode Extensions
+    become: false
+    shell:
+      cmd: code --install-extension '{{ item }}'
+    loop: 
+      - redhat.vscode-yaml
+      - bbenoist.vagrant
+      - ms-python.python
+      - wholroyd.hcl
+      - hashicorp.terraform
+      - golang.go
+      - eamodio.gitlens
+      - ms-azuretools.vscode-docker
+      - gruntfuggly.todo-tree
+
+#####################
+### GOOGLE CHROME ###
+#####################
+
+- block:
+  - name: Install Google Key
+    become: true
+    apt_key: 
+      url: https://dl.google.com/linux/linux_signing_key.pub
+      state: present
+
+  - name: Install Google Repository
+    become: true
+    apt_repository:
+      repo: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
+      state: present
+      filename: google-chrome
+
+  - name: Install Google Chrome
+    become: true
+    apt:
+      name: google-chrome-stable

@@ -1,0 +1,57 @@
+username: guibocz
+
+################
+### MY TOOLS ###
+################
+
+my_tools: enabled
+
+vagrant_version: 2.2.19
+
+vault_version: 1.9.2
+
+terraform_version: 1.1.4
+
+krew_version: 0.4.2
+
+apt_apps:
+  # devops
+  - awscli
+  - git
+  - terminator
+  - virtualbox
+  - docker
+  - remmina
+  # general
+  - unzip
+  - curl
+  - vim
+  - wget
+  - tree
+  - gnome-tweak-tool
+  - fonts-hack-ttf
+
+krew_plugins:
+  - ns
+  - ctx
+  - popeye
+
+###############
+### MY LOOK ###
+###############
+
+my_look: enabled
+
+###############
+### MY CONF ###
+###############
+
+my_conf: enabled
+
+my_k8s_server:
+
+my_k8s_ca_64:
+
+my_client_certificate_64:
+
+my_client_key_64:
